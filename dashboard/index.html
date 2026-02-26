@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>SDK Test Dashboard</title>
+
+    <style>
+        :root {
+            --primary-color: #2f3640;
+            --secondary-color: #1e2227;
+            --success-bg: #f0fff4;
+            --success-border: #c6f6d5;
+            --error-bg: #fff5f5;
+            --error-border: #feb2b2;
+            --border-color: #dcdde1;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            padding: 40px 20px;
+            background: #f5f6fa;
+            color: #2f3640;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 850px;
+            /* Wider for side-by-side inputs */
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            margin-top: 0;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f2f6;
+            font-size: 1.5rem;
+        }
+
+        h3 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: #7f8c8d;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        /* Grid layout for more compact input rows */
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        select,
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        select:focus,
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        textarea {
+            height: 120px;
+            font-family: 'Cascadia Code', 'Courier New', monospace;
+            resize: vertical;
+        }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-top: 10px;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background: var(--secondary-color);
+        }
+
+        button:active {
+            transform: scale(0.99);
+        }
+
+        /* Results Section Styling */
+        .results-container {
+            margin-top: 30px;
+            border-top: 2px solid #f1f2f6;
+            padding-top: 20px;
+        }
+
+        .output-box,
+        #status {
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+
+            /* THE FIX FOR THE OVERFLOW */
+            word-break: break-all;
+            /* Breaks the long payLoad string */
+            white-space: pre-wrap;
+            /* Preserves the JSON line breaks */
+            overflow-wrap: break-word;
+            /* Extra insurance for older browsers */
+
+            background: #f8f9fa;
+            border: 1px solid #dcdde1;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .badge-step1 {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-step2 {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        /* For Step 2 specific box */
+        #final-step-display {
+            background: #f0fff4;
+            border-color: #c6f6d5;
+        }
+
+        .copy-btn {
+            float: right;
+            width: auto;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            margin: 0;
+            background: #eee;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div class="container">
+        <h2>SDK API Test Runner</h2>
+
+        <label>1. Select Target Environment</label>
+        <select id="environment" onchange="toggleSdkLauncher()">
+            <option value="https://dev-api.celerispay.com">Devlopment Environment</option>
+            <option value="https://stagpi.celerispay.com">Staging Environment</option>
+        </select>
+
+        <div class="certificate-container"
+            style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+            <h3 style="margin: 0; font-size: 1.1rem;">Upload Certificate</h3>
+
+            <div class="upload-wrapper">
+                <input type="file" id="certificate_upload" name="certificate_upload" accept=".pem,.crt,.cer,.pfx,.p12"
+                    style="padding: 5px 0;" />
+            </div>
+
+            <div class="format-hint" style="color: #666; font-size: 0.85rem;">
+                <strong>Supported formats:</strong> .pem, .crt, .cer, .pfx
+            </div>
+
+        </div>
+
+        <div class="key-container" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+            <h3 style="margin: 0; font-size: 1.1rem;">Upload Key</h3>
+
+            <div class="upload-wrapper">
+                <input type="file" id="key_upload" name="key_upload" accept=".pem,.crt,.cer,.pfx,.p12"
+                    style="padding: 5px 0;" />
+            </div>
+
+            <div class="format-hint" style="color: #666; font-size: 0.85rem;">
+                <strong>Supported formats:</strong> .pem, .crt, .cer, .pfx
+            </div>
+
+        </div>
+
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 20px;">
+            <label for="accessToken" style="font-weight: bold;">2. Access Token</label>
+            <input type="text" id="accessToken" placeholder="Enter your access token here..."
+                style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+        </div>
+
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 20px;">
+            <label for="apiKey" style="font-weight: bold;">3. Api Key</label>
+            <input type="text" id="apiKey" placeholder="Enter your API key here..."
+                style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+        </div>
+
+        <label>4. Select Category</label>
+        <select id="feature" onchange="updateSubFeatures()">
+            <option value="payment">Payment</option>
+            <option value="payout">Payout</option>
+            <option value="subscription">Subscription</option>
+            <option value="token">Token</option>
+            <option value="webhook">Webhook</option>
+            <option value="backoffice">Backoffice</option>
+            <option value="refund">Refund</option>
+            <option value="status">Status</option>
+            <option value="paymentlink">Payment Link</option>
+            <option value="reporting">Reporting</option>
+            <option value="applepay">Apple Pay</option>
+            <option value="hostedFields">Hosted Fields</option>
+        </select>
+
+        <label>5. Select Specific API</label>
+        <select id="subFeature" onchange="updateJsonPayload()"></select>
+
+        <select id="apiMethod">
+            <option value="POST">POST</option>
+            <option value="GET">GET </option>
+            <option value="PATCH">PATCH </option>
+            <option value="DELETE">DELETE </option>
+        </select>
+
+        <label>6. Request JSON</label>
+        <textarea id="payload">{
+                "amount": 100,
+                "currency": "USD",
+                "customer": "Anant_Test"
+        }</textarea>
+
+        <button type="button" onclick="runTest(event)">Execute API Call</button>
+        <div id="status"></div>
+
+        <div id="results-area" class="result-section">
+
+            <div class="step-header">
+                <h4>Client Auth Call Sent Successfully</h4>
+                <!-- <span class="badge badge-step1">Initial API Call</span> -->
+            </div>
+            <!-- <div id="status" class="output-box"></div> -->
+
+            <div id="final-step-container" style="display: none;">
+                <div class="step-header">
+                    <h3>Final Response</h3>
+                    <!-- <span class="badge badge-step2">Follow-up Encryption</span> -->
+                </div>
+                <div id="final-step-display" class="output-box" style="background: #f0fff4; border: 1px solid #c6f6d5;">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="api-config.js" type="module"></script>
+
+</body>
+
+</html>
