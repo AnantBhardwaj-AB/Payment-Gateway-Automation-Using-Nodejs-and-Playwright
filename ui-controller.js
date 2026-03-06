@@ -26,7 +26,7 @@ export function updateJsonPayload(allData) {
 
         const data = allData[category][subFeature];
         jsonArea.value = JSON.stringify(data.payload, null, 2);
-        
+
     }
 }
 
@@ -36,11 +36,12 @@ export async function runTest(event, allData) {
 
     const selectedCat = document.getElementById('feature').value;
     const selectedSub = document.getElementById('subFeature').value;
-    
+
     const statusDiv = document.getElementById('status');
     const resultsArea = document.getElementById('results-area');
     const finalStepContainer = document.getElementById('final-step-container');
     const finalStepDisplay = document.getElementById('final-step-display');
+    statusDiv.textContent = "Executive API Call";
 
     // FIX: Define these variables BEFORE checking them
 
@@ -82,12 +83,14 @@ export async function runTest(event, allData) {
         if (!response.ok) throw new Error(await response.text());
 
         const result = await response.json();
-        statusDiv.innerHTML = `<pre>${JSON.stringify(result.output, null, 2)}</pre>`;
-        statusDiv.style.background = "#c8e6c9";
-
-        if (result.finalStep && finalStepContainer) {
+        if (result.success) {
+            statusDiv.innerHTML = `<b style="color: green;">✔ API Call Successful</b>`;
+            finalStepDisplay.textContent = JSON.stringify(result.output, null, 2);
             finalStepContainer.style.display = 'block';
-            finalStepDisplay.innerHTML = `<pre>${JSON.stringify(result.finalStep, null, 2)}</pre>`;
+            console.log("Full Server Result:", result);
+        } else {
+            statusDiv.innerHTML = `<b style="color: red;">✘ Error: ${result.output}</b>`;
+            finalStepContainer.style.display = 'none';
         }
     } catch (e) {
         statusDiv.innerHTML = `Request Failed: ${e.message}`;

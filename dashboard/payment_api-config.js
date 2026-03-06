@@ -6,7 +6,7 @@ window.apiData = window.apiData || {};
 window.apiData.payment = {
     "create-payment": {
         path: "/partnerApi",
-        apiType: "withHpp",
+        apiType: "clientAuth",
         payload: {
             lang: api.lang,
             merchant: {

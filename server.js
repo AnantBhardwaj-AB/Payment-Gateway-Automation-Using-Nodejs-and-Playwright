@@ -40,45 +40,42 @@ function getCustomTimestamp() {
     return `${p.hour}${p.minute}${p.second}${p.day}${p.month}${p.year}`;
 }
 
-// function generateHmacHeaders(apiSecret, mid, reference) {
-//     const currTime = new Date();
-//     const utcHeaderDate = currTime.toUTCString().replace("UTC", "GMT");
-//     // const dateHeaderStr = currTime.toUTCString();
-//     const goTimestamp = getCustomTimestamp();
-//     const path = "+/pArTnErApI+";
-//     const encrypt = "clientAuth" + path + goTimestamp + "+" + reference;
-//     console.log(" encrypt---", encrypt)
-
-
-//     const hashStr = crypto
-//         .createHmac('sha256', apiSecret)
-//         .update(encrypt)
-//         .digest('base64');
-
-//     console.log("hashStr ---", hashStr)
-
-//     return {
-//         "dateHeader": utcHeaderDate,
-//         "Authorization": `hmac ${mid}:${reference}:${hashStr}`
-//     };
-// }
-
-function generateHmacHeaders(apiSecret, mid, reference) {
+function generateHmacHeaders(apiSecret, mid, reference, apiType) {
     const currTime = new Date();
     const utcHeaderDate = currTime.toUTCString().replace("UTC", "GMT");
     // const dateHeaderStr = currTime.toUTCString();
     const goTimestamp = getCustomTimestamp();
     const path = "+/pArTnErApI+";
-    const encrypt = "clientAuth" + path + goTimestamp + "+" + reference;
+
+    let encrypt;
+    if (apiType == "clientAuth") {
+
+        encrypt = "clientAuth" + path + goTimestamp + "+" + reference;
+    } else {
+        encrypt = apiType + path + goTimestamp + "+";
+    }
 
     const hashStr = crypto
         .createHmac('sha256', apiSecret)
         .update(encrypt)
         .digest('base64');
 
+    // 3. BUILD THE AUTHORIZATION HEADER
+    let authorization;
+    if (apiType === "clientAuth") {
+        authorization = `hmac ${mid}:${reference}:${hashStr}`;
+    } else {
+        authorization = `hmac ${mid}::${hashStr}`;
+    }
+
+    // return {
+    //     "dateHeader": utcHeaderDate,
+    //     "Authorization": `hmac ${mid}:${reference}:${hashStr}`
+    // };
+
     return {
         "dateHeader": utcHeaderDate,
-        "Authorization": `hmac ${mid}:${reference}:${hashStr}`
+        "Authorization": authorization
     };
 }
 
@@ -176,8 +173,8 @@ function finalResponse(decryptedUrl, responseData, fingerprint, accessToken, mer
             const txnReference = crypto.randomUUID();
 
             // Generate HMAC for the second step
-            const authObj = generateHmacHeaders(apiType, txnReference, accessToken, merchantID);
-
+            // const authObj = generateHmacHeaders(apiType, txnReference, accessToken, merchantID);
+            const authObj = generateHmacHeaders(accessToken, merchantID, txnReference, apiType);
             const reqBody = {
                 "gatewayReference": urlParts[urlParts.length - 1], // The GUID from the URL
                 "merchantID": merchantID,
@@ -244,8 +241,8 @@ app.post('/run-direct-test', (req, res) => {
 
             const finalBodyStr = JSON.stringify(finalBody);
             const reference = crypto.randomUUID();
-            const hmacData = generateHmacHeaders(apiSecret, mid, reference, finalBodyStr, fullUrl);
-            // const hmacData = generateHmacHeaders(apiType, reference, finalBodyStr, fullUrl);
+            // const hmacData = generateHmacHeaders(apiSecret, mid, reference, finalBodyStr, fullUrl);
+            const hmacData = generateHmacHeaders(apiSecret, mid, reference, apiType);
 
             console.log(">>> [3] HMAC Headers generated:", hmacData);
 
@@ -276,34 +273,42 @@ app.post('/run-direct-test', (req, res) => {
             const responseData = await response.json();
             console.log("ResonseData-----", responseData);
 
-            if (responseData.payLoad && responseData.status == "Successful") {
-                try {
-                    console.log(">>> [5] Starting Decryption...")
+            let result = null;
+            const isSuccessful = responseData.status == "Successful" || responseData.requestStatus == "Successful";
 
-                    const decryptedString = decryptPayload(responseData.payLoad, fingerprint);
-                    console.log(">>> Decrypted Content:", decryptedString);
+            if (isSuccessful) {
 
-                    const result = finalResponse(decryptedString, responseData, fingerprint, apiSecret, mid, apiType);
+                if (responseData.payLoad) {
 
-                    res.json({
-                        success: true,
-                        status: response.status(),
-                        output: responseData,
-                        finalStep: result
-                    })
-                } catch (error) {
-                    console.error("!!! Decryption Failed !!!", error.message);
+                    try {
+
+                        console.log(">>> Starting Decryption...");
+                        const decryptedString = decryptPayload(responseData.payLoad, fingerprint);
+                        result = finalResponse(decryptedString, responseData, fingerprint, apiSecret, mid, apiType);
+
+                    } catch (decryptionError) {
+                        console.error("Decryption failed but sending raw output:", decryptionError.message);
+                    }
                 }
 
+                return res.json({
+                    success: true,
+                    status: status,
+                    output: responseData,
+                    finalStep: result
+                });
+            } else {
+                return res.json({
+                    success: false,
+                    status: status,
+                    output: responseData
+                });
             }
-            await requestContext.dispose();
-
-        } catch (error) {
+        } catch (err) {
             console.error("!!! PLAYWRIGHT ERROR !!!", error.message);
-
-            // Cleanup on error if files exist
             if (!res.headersSent) res.status(500).json({ success: false, output: error.message });
-        } finally {
+        }
+        finally {
             // Robust cleanup: Loop through any files Multer created and delete them
             filesToDelete.forEach(filePath => {
                 if (fs.existsSync(filePath)) {

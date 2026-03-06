@@ -156,10 +156,20 @@
             color: #2e7d32;
         }
 
-        /* For Step 2 specific box */
         #final-step-display {
-            background: #f0fff4;
-            border-color: #c6f6d5;
+            background: #f8f9fa;
+            border: 1px solid #c6f6d5;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            /* This preserves the JSON formatting */
+            word-break: break-all;
+            /* This prevents horizontal scrolling */
+            max-height: 500px;
+            overflow-y: auto;
+            /* Adds scrollbar if response is huge */
         }
 
         .copy-btn {
@@ -267,16 +277,9 @@
 
         <div id="results-area" class="result-section">
 
-            <div class="step-header">
-                <h4>Client Auth Call Sent Successfully</h4>
-                <!-- <span class="badge badge-step1">Initial API Call</span> -->
-            </div>
-            <!-- <div id="status" class="output-box"></div> -->
-
             <div id="final-step-container" style="display: none;">
                 <div class="step-header">
                     <h3>Final Response</h3>
-                    <!-- <span class="badge badge-step2">Follow-up Encryption</span> -->
                 </div>
                 <div id="final-step-display" class="output-box" style="background: #f0fff4; border: 1px solid #c6f6d5;">
                 </div>
@@ -287,6 +290,7 @@
 
     <script src="payment_api-config.js" type="module"></script>
     <script src="payout_api-config.js" type="module"></script>
+    <script src="subscription_api-config.js" type="module"></script>
 
     <script src="/ui-controller.js" type="module"></script>
 

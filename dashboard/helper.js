@@ -57,11 +57,11 @@ const paymentMode = {
     bank_transfer: "BANK_TRANSFER",
     debit_card: "DebitCard",
     payPal: "PAYPAL",
-    googlePay:"GOOGLE_PAY",
-    applePay:"APPLE_PAY",
-    netBanking:"NetBanking"
+    googlePay: "GOOGLE_PAY",
+    applePay: "APPLE_PAY",
+    netBanking: "NetBanking"
 
-} 
+}
 
 // Payment Details
 var cardNumber = "4000000000000000";
@@ -125,6 +125,32 @@ var recurringMITExemptionSameAmount = true;
 var recurringMITExemptionOther = true;
 var vimid = "12455"
 
+// Subscription Details
+var planName = "Video Gaming plan";
+var planDescription = "Gaming Plan basic starting plan";
+var planCode =  crypto.randomUUID();
+var automaticDebit = false;
+var installmentsPeriod = "WEEK";
+var installmentsFrequency = 2;
+var installmentsTotalInstallments = 1;
+var installmentsType = "TRIAL";
+var installmentsSequence = 1;
+var installmentsAmount = "10";
+var installmentsCurrencyCode = "EUR";
+var planCarryForwardAmount = true;
+var planPaymentFailureThreshold = 3;
+var retrySequence = 1;
+var retryFrequency = 2;
+var retryPeriod = "DAYS";
+var retryTotalRetry = 1;
+var retryTime = "12:00";
+var feeType = "PERCENTAGE";
+var feeValue = 5;
+var retryPolicyCancelSubscription = true;
+var cutoffPeriod = "DAY_OF_MONTH";
+var cutoffFrequency = 31;
+var retryPolicyblacklistDates = ["07", "01-01", "12-31"]
+
 // Dynamic Descriptors
 var dynamicDescriptorName = "Test Descriptor";
 var dynamicDescriptorEmail = "test@example.com";
@@ -174,7 +200,7 @@ const api = {
     merchantID,
 
     // Basic Info
-    lang, customerId, orderId,currencyCode,
+    lang, customerId, orderId, currencyCode,
 
     // Billing & Shipping
     billingFirstName, billingLastName, billingAddress, billingCity, billingState, billingZip, billingCountry, billingMobileNo, billingEmailId, billingAddressLine1, billingAddressLine2,
@@ -182,21 +208,47 @@ const api = {
 
     // Transaction
     transactionAmount, transactioncurrencyCode, transactionDescription, isApp, executionDate, pageTag,
-    subtotalAmount, tax, shippingCharge, totalValue,paymentMode,cardType,cardNumber,expYear,expMonth,nameOnCard,saveDetails,cvv,paymentToken,paymentToken_PaymentMode,
-    merchantIdentifier,customerEmail,hostedPage,payout,
+    subtotalAmount, tax, shippingCharge, totalValue, paymentMode, cardType, cardNumber, expYear, expMonth, nameOnCard, saveDetails, cvv, paymentToken, paymentToken_PaymentMode,
+    merchantIdentifier, customerEmail, hostedPage, payout,
+
+    // Subscription
+    planName,
+    planDescription,
+    planCode,
+    automaticDebit,
+    installmentsPeriod,
+    installmentsFrequency,
+    installmentsTotalInstallments,
+    installmentsType,
+    installmentsSequence,
+    installmentsAmount,
+    installmentsCurrencyCode,
+    planCarryForwardAmount,
+    planPaymentFailureThreshold,
+    retrySequence,
+    retryFrequency,
+    retryPeriod,
+    retryTotalRetry,
+    retryTime,
+    feeType,
+    feeValue,
+    retryPolicyCancelSubscription,
+    cutoffPeriod,
+    cutoffFrequency,
+    retryPolicyblacklistDates,
 
     // All other variables
     upsell, upsellReferenceId, RecurringSource, RecurringType, RecurringReason,
     challengeIndicator, challengeWindowSize, timezone, browserColorDepth,
     browserScreenHeight, browserScreenWidth, browserLanguage, browserUserAgent,
     lowValue, tra, vimid, successUrl, failureUrl, cartURL,
-    walletAddress, cryptoCurrency,publicAddressIndicator,walletSanctionChecked,isWalletSanctioned,propertyName,dateCheckIn,dateCheckOut,
-    propertyReservationNumber,bookingFirstName,bookingLastName,discountValue,couponCode,couponCodeDetails,
-    cancelUrl,showConfirmation,productUrl,dynamicDescriptorEmail,dynamicDescriptorName,dynamicDescriptorPhone,
-    trustedBeneficiary, iFrame, secureCorporatePayment, delegatedAuthentication, recurringMITExemptionOther,recurringMITExemptionSameAmount,
+    walletAddress, cryptoCurrency, publicAddressIndicator, walletSanctionChecked, isWalletSanctioned, propertyName, dateCheckIn, dateCheckOut,
+    propertyReservationNumber, bookingFirstName, bookingLastName, discountValue, couponCode, couponCodeDetails,
+    cancelUrl, showConfirmation, productUrl, dynamicDescriptorEmail, dynamicDescriptorName, dynamicDescriptorPhone,
+    trustedBeneficiary, iFrame, secureCorporatePayment, delegatedAuthentication, recurringMITExemptionOther, recurringMITExemptionSameAmount,
     browserAcceptHeader, browserColorDepth, browserJavaEnabled, browserJavascriptEnabled, browserIP, osType, acceptContentType,
-    transactionReference,type,captureDuration,midTag,fallbackMidTag
-   
+    transactionReference, type, captureDuration, midTag, fallbackMidTag
+
 };
 
 export { api };
