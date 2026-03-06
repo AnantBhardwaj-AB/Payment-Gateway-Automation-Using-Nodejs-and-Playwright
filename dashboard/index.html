@@ -247,6 +247,7 @@
         <label>5. Select Specific API</label>
         <select id="subFeature" onchange="updateJsonPayload()"></select>
 
+        <label> Select Request Type</label>
         <select id="apiMethod">
             <option value="POST">POST</option>
             <option value="GET">GET </option>
@@ -284,7 +285,12 @@
         </div>
     </div>
 
-    <script src="api-config.js" type="module"></script>
+    <script src="payment_api-config.js" type="module"></script>
+    <script src="payout_api-config.js" type="module"></script>
+
+    <script src="/ui-controller.js" type="module"></script>
+
+    <script src="/main.js" type="module"></script>
 
 </body>
 

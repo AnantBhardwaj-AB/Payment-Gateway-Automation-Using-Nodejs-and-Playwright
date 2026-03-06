@@ -48,6 +48,36 @@ var orderId = "ORDER-" + crypto.randomUUID();
 var isApp = true;
 var executionDate = "2024-12-31 14:00:00";
 var pageTag = "Test Page Tag";
+var cardType = "VisaCard";
+var customerEmail = "test@example.com";
+var hostedPage = false;
+var payout = "true";
+const paymentMode = {
+    credit_card: "CreditCard",
+    bank_transfer: "BANK_TRANSFER",
+    debit_card: "DebitCard",
+    payPal: "PAYPAL",
+    googlePay:"GOOGLE_PAY",
+    applePay:"APPLE_PAY",
+    netBanking:"NetBanking"
+
+} 
+
+// Payment Details
+var cardNumber = "4000000000000000";
+var expYear = "2030";
+var expMonth = "12";
+var nameOnCard = "John";
+var saveDetails = "true";
+var cvv = "123";
+
+var paymentToken = "";
+const paymentToken_PaymentMode = {
+
+    googlePay: "GOOGLE_PAY",
+    applePay: "APPLE_PAY"
+}
+var merchantIdentifier = "";
 
 // Recurring Payment Details
 var upsell = false;
@@ -152,7 +182,8 @@ const api = {
 
     // Transaction
     transactionAmount, transactioncurrencyCode, transactionDescription, isApp, executionDate, pageTag,
-    subtotalAmount, tax, shippingCharge, totalValue,
+    subtotalAmount, tax, shippingCharge, totalValue,paymentMode,cardType,cardNumber,expYear,expMonth,nameOnCard,saveDetails,cvv,paymentToken,paymentToken_PaymentMode,
+    merchantIdentifier,customerEmail,hostedPage,payout,
 
     // All other variables
     upsell, upsellReferenceId, RecurringSource, RecurringType, RecurringReason,

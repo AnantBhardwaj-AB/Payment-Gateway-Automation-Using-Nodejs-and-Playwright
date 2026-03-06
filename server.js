@@ -5,16 +5,19 @@ const { request } = require('playwright'); // 1. Import Playwright
 const crypto = require('crypto');
 const CryptoJS = require('crypto-js');
 const path = require('path');
-const { Console, error } = require('console');
+
 const app = express();
+app.use(express.json());
+
+app.use(express.static(path.join(__dirname, 'dashboard')));
+
+app.use(express.static(__dirname));
+
+// const { Console, error } = require('console');
 const uploadMiddleware = multer({ dest: 'uploads/' }).fields([
     { name: 'certificate_upload', maxCount: 1 },
     { name: 'key_upload', maxCount: 1 }
 ]);
-
-app.use(express.json());
-app.use(express.static('dashboard'));
-
 
 function getCustomTimestamp() {
     // 1. Get current time in India (IST)
@@ -205,15 +208,14 @@ app.post('/run-direct-test', (req, res) => {
 
     // Execute Multer manually to catch errors
     uploadMiddleware(req, res, async (err) => {
+
+        let filesToDelete = [];
         if (err) {
             console.error("Multer Middleware Error:", err);
             return res.status(400).json({ success: false, output: err.message });
         }
 
         console.log("--- Playwright API Request Received ---");
-        let certPath;
-        let keyPath;
-
         try {
             const { mid, apiSecret, payload, fullUrl, apiType } = req.body;
 
@@ -283,8 +285,8 @@ app.post('/run-direct-test', (req, res) => {
 
                     const result = finalResponse(decryptedString, responseData, fingerprint, apiSecret, mid, apiType);
 
-                    res.json ({
-                        success:true,
+                    res.json({
+                        success: true,
                         status: response.status(),
                         output: responseData,
                         finalStep: result
@@ -302,8 +304,17 @@ app.post('/run-direct-test', (req, res) => {
             // Cleanup on error if files exist
             if (!res.headersSent) res.status(500).json({ success: false, output: error.message });
         } finally {
-            if (certPath && fs.existsSync(certPath)) fs.unlinkSync(certPath);
-            if (keyPath && fs.existsSync(keyPath)) fs.unlinkSync(keyPath);
+            // Robust cleanup: Loop through any files Multer created and delete them
+            filesToDelete.forEach(filePath => {
+                if (fs.existsSync(filePath)) {
+                    try {
+                        fs.unlinkSync(filePath);
+                        console.log(`Successfully deleted: ${filePath}`);
+                    } catch (e) {
+                        console.error(`Failed to delete ${filePath}:`, e.message);
+                    }
+                }
+            });
         }
     });
 });
