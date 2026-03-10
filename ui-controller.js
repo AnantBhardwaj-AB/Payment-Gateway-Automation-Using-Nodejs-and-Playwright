@@ -1,9 +1,9 @@
+import { api } from "./dashboard/helper.js";
 
 // 2. Add the UI Update Functions
 export function updateSubFeatures(allData) {
     const category = document.getElementById('feature').value;
     const subSelect = document.getElementById('subFeature');
-    // const selectedCategory = category.value;
     subSelect.innerHTML = ""; // Clear existing options
 
     if (allData && allData[category]) {
@@ -28,6 +28,14 @@ export function updateJsonPayload(allData) {
         jsonArea.value = JSON.stringify(data.payload, null, 2);
 
     }
+}
+
+function resolveDynamicPath(path, state) {
+    // This regex looks for anything inside curly braces: {variableName}
+    return path.replace(/\{(\w+)\}/g, (match, key) => {
+        // If api[key] exists (e.g., api.planId), use it. Otherwise, keep the placeholder.
+        return state[key] !== undefined ? state[key] : match;
+    });
 }
 
 // 3. Your existing runTest function (Updated to include subFeature)
@@ -65,27 +73,58 @@ export async function runTest(event, allData) {
     statusDiv.style.display = 'block';
     statusDiv.innerHTML = "Processing mTLS Handshake & Encryption...";
     statusDiv.style.background = "#fff3cd";
+    finalStepContainer.style.display = 'none';
+    finalStepDisplay.textContent = "";
 
     const formData = new FormData();
+
+    const method = document.getElementById('apiMethod').value;
+
+    let rawPayload = document.getElementById('payload').value;
+    const resolvedPayload = resolveDynamicPath(rawPayload, api);
+
+    formData.append('reqType', method);
     formData.append('certificate_upload', certFile);
     formData.append('key_upload', keyFile);
     formData.append('mid', document.getElementById('apiKey').value);
     formData.append('apiSecret', document.getElementById('accessToken').value);
-    formData.append('reqType', document.getElementById('apiMethod').value);
-    formData.append('payload', document.getElementById('payload').value);
+    formData.append('reqType', method);
+    formData.append('payload', resolvedPayload);
     formData.append('apiType', apiConfig.apiType || "default");
 
     const baseUrl = document.getElementById('environment').value;
-    formData.append('fullUrl', `${baseUrl}${apiConfig.path}`);
+
+    const resolvedPath = resolveDynamicPath(apiConfig.path, api);
+
+    const finalUrl = `${baseUrl}${resolvedPath}`;
+    formData.append('fullUrl', finalUrl);
 
     try {
         const response = await fetch('/run-direct-test', { method: 'POST', body: formData });
         if (!response.ok) throw new Error(await response.text());
 
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new Error(`Server returned HTML instead of JSON. Check terminal!`);
+        }
+
         const result = await response.json();
-        if (result.success) {
+        if (result.success && result.output) {
+
+            const keyToSave = ['planId'];
+            keyToSave.forEach(key => {
+                if (result.output[key]) {
+                    api[key] = result.output[key];
+                    console.log(`Saved ${key}:`, api[key]);
+                }
+            });
+            updateJsonPayload(allData);
             statusDiv.innerHTML = `<b style="color: green;">✔ API Call Successful</b>`;
-            finalStepDisplay.textContent = JSON.stringify(result.output, null, 2);
+            let displayText = "--- API RESPONSE ---\n" + JSON.stringify(result.output, null, 2);
+            if (result.finalStep) {
+                displayText += "\n\n--- Data after Decrypted ---\n" + JSON.stringify(result.finalStep, null, 2);
+            }
+            finalStepDisplay.textContent = displayText;
             finalStepContainer.style.display = 'block';
             console.log("Full Server Result:", result);
         } else {

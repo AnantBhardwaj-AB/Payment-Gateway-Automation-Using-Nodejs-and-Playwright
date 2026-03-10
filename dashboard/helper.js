@@ -127,13 +127,18 @@ var vimid = "12455"
 
 // Subscription Details
 var planName = "Video Gaming plan";
+var updatePlanName = "Renew the plan for gaming"
+var updatePlanDescription = "Renew the payment of plan";
 var planDescription = "Gaming Plan basic starting plan";
 var planCode =  crypto.randomUUID();
+var updatePlanCode = crypto.randomUUID();
 var automaticDebit = false;
 var installmentsPeriod = "WEEK";
+var updateinstallmentperiod = "MONTH";
 var installmentsFrequency = 2;
 var installmentsTotalInstallments = 1;
 var installmentsType = "TRIAL";
+var updateinstallmentsType = "REGULAR";
 var installmentsSequence = 1;
 var installmentsAmount = "10";
 var installmentsCurrencyCode = "EUR";
@@ -142,6 +147,7 @@ var planPaymentFailureThreshold = 3;
 var retrySequence = 1;
 var retryFrequency = 2;
 var retryPeriod = "DAYS";
+var updateretryPeriod = "HOURS";
 var retryTotalRetry = 1;
 var retryTime = "12:00";
 var feeType = "PERCENTAGE";
@@ -150,6 +156,11 @@ var retryPolicyCancelSubscription = true;
 var cutoffPeriod = "DAY_OF_MONTH";
 var cutoffFrequency = 31;
 var retryPolicyblacklistDates = ["07", "01-01", "12-31"]
+var subscriptionDescription = "Test";
+var subscriptionTotalCycles = 2;
+var subscriptionQuantity = 1;
+var subscriptionExpireIn = 7;
+var subscriptionExternal = true;
 
 // Dynamic Descriptors
 var dynamicDescriptorName = "Test Descriptor";
@@ -162,6 +173,8 @@ var failureUrl = "https://domain.com/failure";
 var cancelUrl = "https://domain.com/cancel";
 var cartURL = "https://domain.com/cart.html";
 var productUrl = "https://domain.com/product.html";
+var privacyURL = "http://www.domain.com/CancelResponse.html";
+var termsURL = "http://www.domain.com/CancelResponse.html";
 var showConfirmation = "true";
 var iFrame = "false";
 
@@ -191,6 +204,10 @@ var publicAddressIndicator = true;
 var walletSanctionChecked = true;
 var isWalletSanctioned = false;
 var cryptoCurrency = "Bitcoin";
+
+// Notification Channels
+var notificationChannelName = "sms";
+var notificationChannelValue = "1234567";
 
 
 var customerId = crypto.randomUUID();
@@ -236,6 +253,17 @@ const api = {
     cutoffPeriod,
     cutoffFrequency,
     retryPolicyblacklistDates,
+    updatePlanCode,
+    updatePlanName,
+    updatePlanDescription,
+    updateinstallmentperiod,
+    updateinstallmentsType,
+    updateretryPeriod,
+    subscriptionDescription,
+    subscriptionExpireIn,
+    subscriptionExternal,
+    subscriptionQuantity,
+    subscriptionTotalCycles,
 
     // All other variables
     upsell, upsellReferenceId, RecurringSource, RecurringType, RecurringReason,
@@ -247,7 +275,7 @@ const api = {
     cancelUrl, showConfirmation, productUrl, dynamicDescriptorEmail, dynamicDescriptorName, dynamicDescriptorPhone,
     trustedBeneficiary, iFrame, secureCorporatePayment, delegatedAuthentication, recurringMITExemptionOther, recurringMITExemptionSameAmount,
     browserAcceptHeader, browserColorDepth, browserJavaEnabled, browserJavascriptEnabled, browserIP, osType, acceptContentType,
-    transactionReference, type, captureDuration, midTag, fallbackMidTag
+    transactionReference, type, captureDuration, midTag, fallbackMidTag, notificationChannelName, notificationChannelValue, privacyURL, termsURL
 
 };
 

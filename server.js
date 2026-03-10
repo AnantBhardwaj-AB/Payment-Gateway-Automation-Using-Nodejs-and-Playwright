@@ -146,6 +146,8 @@ function decryptPayload(encryptedHex, fingerprint) {
         // 5. Convert to String and apply cleanDecryptedData() logic
         const decipherFinal = decrypted.toString('utf8');
 
+        console.log("Decryption End <<<<")
+
         return decipherFinal
             .replace(/[\u0000-\u001F]+/g, '') // Remove non-printable/null characters
             .trim();
@@ -215,6 +217,9 @@ app.post('/run-direct-test', (req, res) => {
         console.log("--- Playwright API Request Received ---");
         try {
             const { mid, apiSecret, payload, fullUrl, apiType } = req.body;
+            let {reqType} = req.body;
+
+            const finalMethod = Array.isArray(reqType) ? reqType[0] : (reqType || 'POST');
 
             const certFile = req.files['certificate_upload']?.[0];
             const keyFile = req.files['key_upload']?.[0];
@@ -241,8 +246,9 @@ app.post('/run-direct-test', (req, res) => {
 
             const finalBodyStr = JSON.stringify(finalBody);
             const reference = crypto.randomUUID();
-            // const hmacData = generateHmacHeaders(apiSecret, mid, reference, finalBodyStr, fullUrl);
+            // const hmacData = generateHmacHeaders(apiSecret, mid, reference, reqType, apiType);
             const hmacData = generateHmacHeaders(apiSecret, mid, reference, apiType);
+
 
             console.log(">>> [3] HMAC Headers generated:", hmacData);
 
@@ -257,10 +263,11 @@ app.post('/run-direct-test', (req, res) => {
                 }]
             });
 
-            console.log(`Sending Playwright POST to: ${fullUrl}`);
+            console.log(`Sending Playwright: ${fullUrl}`);
 
             // 2. Execute Request
-            const response = await requestContext.post(fullUrl, {
+            const response = await requestContext.fetch(fullUrl, {
+                method: finalMethod,
                 data: finalBodyStr,
                 headers: {
                     ...hmacData,
@@ -268,15 +275,20 @@ app.post('/run-direct-test', (req, res) => {
                 }
             });
 
+            console.log("method is ..", finalMethod);
+
             const status = response.status();
             console.log(`>>> [4] Playwright received response with status: ${status}`);
             const responseData = await response.json();
             console.log("ResonseData-----", responseData);
 
             let result = null;
-            const isSuccessful = responseData.status == "Successful" || responseData.requestStatus == "Successful";
+            const isSuccessful = responseData.requestStatus === "Successful" ||
+                responseData.status === "Successful" ||
+                responseData.status === "ACTIVE" ||
+                status === 200;
 
-            if (isSuccessful) {
+            if (status === 200 || status === 201 || isSuccessful) {
 
                 if (responseData.payLoad) {
 
@@ -285,6 +297,7 @@ app.post('/run-direct-test', (req, res) => {
                         console.log(">>> Starting Decryption...");
                         const decryptedString = decryptPayload(responseData.payLoad, fingerprint);
                         result = finalResponse(decryptedString, responseData, fingerprint, apiSecret, mid, apiType);
+                        console.log("Result is ....", result);
 
                     } catch (decryptionError) {
                         console.error("Decryption failed but sending raw output:", decryptionError.message);
@@ -298,15 +311,15 @@ app.post('/run-direct-test', (req, res) => {
                     finalStep: result
                 });
             } else {
-                return res.json({
+                return res.status(status).json({
                     success: false,
                     status: status,
                     output: responseData
                 });
             }
         } catch (err) {
-            console.error("!!! PLAYWRIGHT ERROR !!!", error.message);
-            if (!res.headersSent) res.status(500).json({ success: false, output: error.message });
+            console.error("!!! PLAYWRIGHT ERROR !!!", err.message);
+            if (!res.headersSent) res.status(500).json({ success: false, output: err.message });
         }
         finally {
             // Robust cleanup: Loop through any files Multer created and delete them
