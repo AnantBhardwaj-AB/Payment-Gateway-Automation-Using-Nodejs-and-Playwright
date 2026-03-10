@@ -166,7 +166,7 @@ window.apiData.subscription = {
             transaction: {
                 txnReference: api.transactionReference,
                 automaticDebit: api.automaticDebit,
-                recurring:{
+                recurring: {
                     upsell: api.upsell,
                     upsellReference: api.upsellReferenceId,
                     source: api.RecurringSource,
@@ -174,14 +174,46 @@ window.apiData.subscription = {
                     reason: api.RecurringReason
                 },
             },
-            url:{
+            url: {
                 showConfirmationPage: api.showConfirmation,
                 privacyURL: api.privacyURL,
                 termsURL: api.termsURL
             },
         },
     },
-    "update-Subscription": {},
+    "update-Subscription": {
+        get path() {
+            const mID = api.merchantID || 'MISSING_MID'
+            const sID = api.subscriptionId || '{subscriptionId}'
+            return `/${mID}/subscriptions/${sID}`;
+        },
+        apiType: "updateSubscription",
+        payload: {
+            merchant: {
+                merchantID: api.merchantID,
+                customerID: api.customerId
+            },
+            startDate: api.startDate,
+            description: api.subscriptionDescription,
+            totalCycles: api.updateSubscriptionTotalCycles,
+            quantity: api.updateSubscriptionQuantity,
+            expireIn: api.updateSubscriptionExpireIn,
+            customer: {
+                notificationChannels: [{
+                    name: api.updateSubscriptionNotificationChannelName,
+                    value: api.updateSubscriptionNotificationChannelValue
+                }],
+            },
+            transaction: {
+                txnReference: api.transactionReference
+            },
+            url: {
+                showConfirmationPage: api.showConfirmation,
+                privacyURL: api.privacyURL,
+                termsURL: api.termsURL
+            },
+        },
+    },
     "retrieve-Subscription-Details": {},
     "deactivate-Subscription": {},
     "reactivate-Subscription": {},

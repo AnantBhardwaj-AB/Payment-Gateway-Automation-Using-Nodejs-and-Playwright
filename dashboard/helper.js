@@ -161,6 +161,11 @@ var subscriptionTotalCycles = 2;
 var subscriptionQuantity = 1;
 var subscriptionExpireIn = 7;
 var subscriptionExternal = true;
+var updateSubscriptionTotalCycles = 1;
+var updateSubscriptionQuantity = 2;
+var updateSubscriptionExpireIn = 8;
+var updateSubscriptionNotificationChannelName = "SLACK";
+var updateSubscriptionNotificationChannelValue = "https://hooks.slack.com/services/T00000000";
 
 // Dynamic Descriptors
 var dynamicDescriptorName = "Test Descriptor";
@@ -264,6 +269,11 @@ const api = {
     subscriptionExternal,
     subscriptionQuantity,
     subscriptionTotalCycles,
+    updateSubscriptionExpireIn,
+    updateSubscriptionNotificationChannelName,
+    updateSubscriptionNotificationChannelValue,
+    updateSubscriptionQuantity,
+    updateSubscriptionTotalCycles,
 
     // All other variables
     upsell, upsellReferenceId, RecurringSource, RecurringType, RecurringReason,
