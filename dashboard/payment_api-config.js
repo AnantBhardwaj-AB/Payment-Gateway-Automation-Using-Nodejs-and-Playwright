@@ -43,50 +43,50 @@ window.apiData.payment = {
             transaction: {
                 txnAmount: api.transactionAmount,
                 currencyCode: api.currencyCode,
-                txnReference: api.transactionReference,
-                orderId: api.orderId,
-                isApp: api.isApp,
-                type: api.type,
-                captureDuration: api.captureDuration,
-                executionDate: api.executionDate,
-                pageTag: api.pageTag,
-                midTag: api.midTag,
-                fallbackMidTag: api.fallbackMidTag,
-                recurring: {
-                    upsell: api.upsell,
-                    upsellReference: api.upsellReferenceId,
-                    source: api.RecurringSource.CIT,
-                    recurringType: api.RecurringType.Recurring,
-                    reason: api.RecurringReason.NOT_SHOW
-                },
-                "3DSecure": {
-                    deviceFingerprint: {
-                        timezone: api.timezone,
-                        browserColorDepth: api.browserColorDepth,
-                        browserLanguage: api.browserLanguage,
-                        browserScreenHeight: api.browserScreenHeight,
-                        browserScreenWidth: api.browserScreenWidth,
-                        os: api.os,
-                        browserAcceptHeader: api.browserAcceptHeader,
-                        userAgent: api.userAgent,
-                        browserJavascriptEnabled: api.browserJavascriptEnabled,
-                        browserJavaEnabled: api.browserJavaEnabled,
-                        acceptContent: api.acceptContentType,
-                        browserIP: api.browserIP
-                    },
-                    exemptions: {
-                        lowValue: api.lowValue,
-                        tra: api.tra,
-                        trustedBeneficiary: api.trustedBeneficiary,
-                        secureCorporatePayment: api.secureCorporatePayment,
-                        delegatedAuthentication: api.delegatedAuthentication,
-                        recurringMITExemptionSameAmount: api.recurringMITExemptionSameAmount,
-                        recurringMITExemptionOther: api.recurringMITExemptionOther,
-                        vmid: api.vimid
-                    },
-                    challengeIndicator: api.challengeIndicator,
-                    challengeWindowSize: api.challengeWindowSize
-                },
+                txnReference: api.paymenttransactionReference,
+                // orderId: api.orderId,
+                // isApp: api.isApp,
+                // type: api.type,
+                // captureDuration: api.captureDuration,
+                // executionDate: api.executionDate,
+                // pageTag: api.pageTag,
+                // midTag: api.midTag,
+                // fallbackMidTag: api.fallbackMidTag,
+                // recurring: {
+                //     upsell: api.upsell,
+                //     upsellReference: api.upsellReferenceId,
+                //     source: api.RecurringSource.CIT,
+                //     recurringType: api.RecurringType.Recurring,
+                //     reason: api.RecurringReason.NOT_SHOW
+                // },
+                // "3DSecure": {
+                //     deviceFingerprint: {
+                //         timezone: api.timezone,
+                //         browserColorDepth: api.browserColorDepth,
+                //         browserLanguage: api.browserLanguage,
+                //         browserScreenHeight: api.browserScreenHeight,
+                //         browserScreenWidth: api.browserScreenWidth,
+                //         os: api.os,
+                //         browserAcceptHeader: api.browserAcceptHeader,
+                //         userAgent: api.userAgent,
+                //         browserJavascriptEnabled: api.browserJavascriptEnabled,
+                //         browserJavaEnabled: api.browserJavaEnabled,
+                //         acceptContent: api.acceptContentType,
+                //         browserIP: api.browserIP
+                //     },
+                //     exemptions: {
+                //         lowValue: api.lowValue,
+                //         tra: api.tra,
+                //         trustedBeneficiary: api.trustedBeneficiary,
+                //         secureCorporatePayment: api.secureCorporatePayment,
+                //         delegatedAuthentication: api.delegatedAuthentication,
+                //         recurringMITExemptionSameAmount: api.recurringMITExemptionSameAmount,
+                //         recurringMITExemptionOther: api.recurringMITExemptionOther,
+                //         vmid: api.vimid
+                //     },
+                //     challengeIndicator: api.challengeIndicator,
+                //     challengeWindowSize: api.challengeWindowSize
+                // },
             },
             dynamicDescriptor: {
                 name: api.dynamicDescriptorName,
@@ -97,10 +97,10 @@ window.apiData.payment = {
                 successURL: api.successUrl,
                 failURL: api.failureUrl,
                 cancelURL: api.cancelUrl,
-                showConfirmationPage: api.showConfirmation,
-                cartURL: api.cartURL,
-                productURL: api.productUrl,
-                iFrame: api.iFrame
+                // showConfirmationPage: api.showConfirmation,
+                // cartURL: api.cartURL,
+                // productURL: api.productUrl,
+                // iFrame: api.iFrame
             },
 
         }

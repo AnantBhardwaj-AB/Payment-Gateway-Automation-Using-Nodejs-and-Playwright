@@ -38,6 +38,7 @@ var transactionAmount = 10.00;
 var transactioncurrencyCode = "USD";
 var transactionDescription = "Test Transaction";
 var transactionReference = crypto.randomUUID();
+var paymenttransactionReference = crypto.randomUUID();
 var type = "auth";
 var captureDuration = "7";
 var executionDate = "2022-04-20 14:23:20";
@@ -130,7 +131,7 @@ var planName = "Video Gaming plan";
 var updatePlanName = "Renew the plan for gaming"
 var updatePlanDescription = "Renew the payment of plan";
 var planDescription = "Gaming Plan basic starting plan";
-var planCode =  crypto.randomUUID();
+var planCode = crypto.randomUUID();
 var updatePlanCode = crypto.randomUUID();
 var automaticDebit = false;
 var installmentsPeriod = "WEEK";
@@ -166,6 +167,8 @@ var updateSubscriptionQuantity = 2;
 var updateSubscriptionExpireIn = 8;
 var updateSubscriptionNotificationChannelName = "SLACK";
 var updateSubscriptionNotificationChannelValue = "https://hooks.slack.com/services/T00000000";
+var applyDate = "2026-03-07";
+var startDate = "2026-03-01";
 
 // Dynamic Descriptors
 var dynamicDescriptorName = "Test Descriptor";
@@ -231,7 +234,7 @@ const api = {
     // Transaction
     transactionAmount, transactioncurrencyCode, transactionDescription, isApp, executionDate, pageTag,
     subtotalAmount, tax, shippingCharge, totalValue, paymentMode, cardType, cardNumber, expYear, expMonth, nameOnCard, saveDetails, cvv, paymentToken, paymentToken_PaymentMode,
-    merchantIdentifier, customerEmail, hostedPage, payout,
+    merchantIdentifier, customerEmail, hostedPage, payout, paymenttransactionReference,
 
     // Subscription
     planName,
@@ -274,6 +277,8 @@ const api = {
     updateSubscriptionNotificationChannelValue,
     updateSubscriptionQuantity,
     updateSubscriptionTotalCycles,
+    applyDate,
+    startDate,
 
     // All other variables
     upsell, upsellReferenceId, RecurringSource, RecurringType, RecurringReason,

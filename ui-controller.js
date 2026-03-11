@@ -83,7 +83,15 @@ export async function runTest(event, allData) {
     let rawPayload = document.getElementById('payload').value;
     const resolvedPayload = resolveDynamicPath(rawPayload, api);
 
-    formData.append('reqType', method);
+    let txnRefForHmac = "";
+    try {
+        const parsedPayload = JSON.parse(resolvedPayload);
+        // Navigate the object: transaction -> txnReference
+        txnRefForHmac = parsedPayload.transaction?.txnReference || "";
+    } catch (e) {
+        console.warn("Could not parse payload for reference, fallback to default.");
+    }
+
     formData.append('certificate_upload', certFile);
     formData.append('key_upload', keyFile);
     formData.append('mid', document.getElementById('apiKey').value);
@@ -91,6 +99,7 @@ export async function runTest(event, allData) {
     formData.append('reqType', method);
     formData.append('payload', resolvedPayload);
     formData.append('apiType', apiConfig.apiType || "default");
+    formData.append('reference', txnRefForHmac);
 
     const baseUrl = document.getElementById('environment').value;
 
@@ -111,7 +120,7 @@ export async function runTest(event, allData) {
         const result = await response.json();
         if (result.success && result.output) {
 
-            const keyToSave = ['planId','subscriptionId'];
+            const keyToSave = ['planId', 'subscriptionId', 'paymenttransactionReference'];
             keyToSave.forEach(key => {
                 if (result.output[key]) {
                     api[key] = result.output[key];
@@ -123,6 +132,30 @@ export async function runTest(event, allData) {
             let displayText = "--- API RESPONSE ---\n" + JSON.stringify(result.output, null, 2);
             if (result.finalStep) {
                 displayText += "\n\n--- Data after Decrypted ---\n" + JSON.stringify(result.finalStep, null, 2);
+                const { endpoint, data } = result.finalStep;
+
+                let cleanData = (typeof data === 'string') ? data : JSON.stringify(data);
+                console.log("cleanData.......", cleanData);
+
+
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = endpoint;
+                form.target = '_top';
+
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'data';
+                input.value = cleanData;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+
+                console.log("DEBUG: Posting to", endpoint);
+                console.log("DEBUG: Data value", cleanData);
+                console.log("Form is ...", form);
+
+                form.submit();
             }
             finalStepDisplay.textContent = displayText;
             finalStepContainer.style.display = 'block';

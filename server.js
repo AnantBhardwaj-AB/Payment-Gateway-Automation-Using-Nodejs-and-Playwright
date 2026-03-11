@@ -158,7 +158,7 @@ function decryptPayload(encryptedHex, fingerprint) {
     }
 }
 
-function finalResponse(decryptedUrl, responseData, fingerprint, accessToken, merchantID, apiType) {
+function finalResponse(decryptedString, responseData, fingerprint, accessToken, merchantID, apiType, reference) {
     try {
 
         // 1. Check if we actually have the payLoad (Capital L)
@@ -167,35 +167,42 @@ function finalResponse(decryptedUrl, responseData, fingerprint, accessToken, mer
         }
 
         // 2. The URL logic
-        var endpoint = decryptedUrl;
-        var updatedUrl = endpoint.replace("//", "/");
-        var urlParts = updatedUrl.split("/");
+        var endpoint = decryptedString.trim();
+        const urlParts = endpoint.split('/').filter(part => part.length > 0);
 
-        if (urlParts.length > 1) {
-            const txnReference = crypto.randomUUID();
+        // Get the very last part of the URL (the GUID)
+        const gatewayReference = urlParts[urlParts.length - 1];
 
-            // Generate HMAC for the second step
-            // const authObj = generateHmacHeaders(apiType, txnReference, accessToken, merchantID);
-            const authObj = generateHmacHeaders(accessToken, merchantID, txnReference, apiType);
-            const reqBody = {
-                "gatewayReference": urlParts[urlParts.length - 1], // The GUID from the URL
-                "merchantID": merchantID,
-                ...authObj
-            };
+        // if (urlParts.length > 1) {
 
-            // Encrypt the new request
-            var payloadData = encryptPayload(reqBody, accessToken, fingerprint);
+        // Generate HMAC for the second step
+        // const authObj = generateHmacHeaders(apiType, txnReference, accessToken, merchantID);
+        const authObj = generateHmacHeaders(accessToken, merchantID, reference, apiType);
+        const reqBody = {
+            // "gatewayReference": gatewayRef, // The GUID from the URL
+            // "merchantID": merchantID,
+            // ...authObj
+            "gatewayReference": gatewayReference,
+            "merchantID": merchantID,
+            "dateHeader": authObj.dateHeader,
+            "Authorization": authObj.Authorization,
+            "sync": false // Matches SDK logs
+        };
+        console.log("reqBody...........", reqBody)
 
-            var finalData = {
-                "data": JSON.stringify({
-                    payLoad: payloadData,
-                    "apiKey": merchantID
-                }),
-                "endpoint": endpoint
-            };
+        // Encrypt the new request
+        var payloadData = encryptPayload(reqBody, accessToken, fingerprint);
 
-            return finalData;
-        }
+        var finalData = {
+            "data": JSON.stringify({
+                payLoad: payloadData,
+                "apiKey": merchantID
+            }),
+            "endpoint": endpoint
+        };
+
+        return finalData;
+        // }
     } catch (err) {
         console.log("Error in finalResponse logic:", err.message);
         return { error: err.message };
@@ -216,8 +223,8 @@ app.post('/run-direct-test', (req, res) => {
 
         console.log("--- Playwright API Request Received ---");
         try {
-            const { mid, apiSecret, payload, fullUrl, apiType } = req.body;
-            let {reqType} = req.body;
+            const { mid, apiSecret, payload, fullUrl, apiType, reference: uiReference } = req.body;
+            let { reqType } = req.body;
 
             const finalMethod = Array.isArray(reqType) ? reqType[0] : (reqType || 'POST');
 
@@ -245,9 +252,9 @@ app.post('/run-direct-test', (req, res) => {
             console.log("Which MID is being used? ", mid);
 
             const finalBodyStr = JSON.stringify(finalBody);
-            const reference = crypto.randomUUID();
-            // const hmacData = generateHmacHeaders(apiSecret, mid, reference, reqType, apiType);
-            const hmacData = generateHmacHeaders(apiSecret, mid, reference, apiType);
+            const finalReference = uiReference || crypto.randomUUID();           
+             // const hmacData = generateHmacHeaders(apiSecret, mid, reference, reqType, apiType);
+            const hmacData = generateHmacHeaders(apiSecret, mid, finalReference, apiType);
 
 
             console.log(">>> [3] HMAC Headers generated:", hmacData);
@@ -296,7 +303,7 @@ app.post('/run-direct-test', (req, res) => {
 
                         console.log(">>> Starting Decryption...");
                         const decryptedString = decryptPayload(responseData.payLoad, fingerprint);
-                        result = finalResponse(decryptedString, responseData, fingerprint, apiSecret, mid, apiType);
+                        result = finalResponse(decryptedString, responseData, fingerprint, apiSecret, mid, apiType, finalReference);
                         console.log("Result is ....", result);
 
                     } catch (decryptionError) {
