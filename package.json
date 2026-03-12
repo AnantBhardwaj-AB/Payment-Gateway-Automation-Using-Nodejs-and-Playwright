@@ -15,7 +15,8 @@
     "axios": "^1.13.5",
     "crypto-js": "^4.2.0",
     "express": "^5.2.1",
+    "moment": "^2.30.1",
     "multer": "^2.0.2",
-    "require": "^2.4.20"
+    "require": "^0.4.4"
   }
 }

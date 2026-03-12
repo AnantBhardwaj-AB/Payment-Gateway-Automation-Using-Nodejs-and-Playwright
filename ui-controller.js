@@ -98,7 +98,7 @@ export async function runTest(event, allData) {
     formData.append('apiSecret', document.getElementById('accessToken').value);
     formData.append('reqType', method);
     formData.append('payload', resolvedPayload);
-    formData.append('apiType', apiConfig.apiType || "default");
+    formData.append('apiType', apiConfig.apiType || "clientAuth");
     formData.append('reference', txnRefForHmac);
 
     const baseUrl = document.getElementById('environment').value;

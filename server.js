@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const multer = require('multer');
 const { request } = require('playwright'); // 1. Import Playwright
+const moment = require('moment');
 const crypto = require('crypto');
 const CryptoJS = require('crypto-js');
 const path = require('path');
@@ -40,42 +41,62 @@ function getCustomTimestamp() {
     return `${p.hour}${p.minute}${p.second}${p.day}${p.month}${p.year}`;
 }
 
+// function generateHmacHeaders(apiSecret, mid, reference, apiType) {
+//     const currTime = new Date();
+//     const utcHeaderDate = currTime.toUTCString().replace("UTC", "GMT");
+//     // const dateHeaderStr = currTime.toUTCString();
+//     const goTimestamp = getCustomTimestamp();       
+//     const path = "+/pArTnErApI+";
+//     let encrypt;
+//     if (apiType == "clientAuth") {
+//         encrypt = "clientAuth" + path + goTimestamp + "+" + reference;
+
+//     } else {
+//         encrypt = apiType + path + goTimestamp + "+";
+//     }
+
+//     console.log("encrypt.....", encrypt);
+
+//     const hashStr = crypto
+//         .createHmac('sha256', apiSecret)
+//         .update(encrypt)
+//         .digest('base64');
+
+//     // 3. BUILD THE AUTHORIZATION HEADER
+//     let authorization;
+//     if (apiType === "clientAuth") {
+//         authorization = `hmac ${mid}:${reference}:${hashStr}`;
+//     } else {
+//         authorization = `hmac ${mid}::${hashStr}`;
+//     }
+
+//     return {
+//         "dateHeader": utcHeaderDate,
+//         "Authorization": authorization
+//     };
+// }
+
 function generateHmacHeaders(apiSecret, mid, reference, apiType) {
-    const currTime = new Date();
-    const utcHeaderDate = currTime.toUTCString().replace("UTC", "GMT");
-    // const dateHeaderStr = currTime.toUTCString();
-    const goTimestamp = getCustomTimestamp();
+    const timeObj = moment();
+
+    // 1. Bank standard: Header is GMT, Hash is IST (+0530)
+    const dateHeader = timeObj.clone().utcOffset('+0000').format('ddd, DD MMM YYYY HH:mm:ss') + " GMT";
+    const goTimestamp = timeObj.clone().utcOffset('+0530').format('HHmmssDDMMYYYY');
+
     const path = "+/pArTnErApI+";
 
-    let encrypt;
-    if (apiType == "clientAuth") {
+    // 2. Format matches Go: apiType + path + timestamp + "+" + reference
+    // This is where the mismatch was: the bank expects "withHPP" here for step 2
+    const encrypt = `${apiType}${path}${goTimestamp}+${reference}`;
 
-        encrypt = "clientAuth" + path + goTimestamp + "+" + reference;
-    } else {
-        encrypt = apiType + path + goTimestamp + "+";
-    }
+    console.log(">>> [HMAC LOG] Signing with Token. String:", encrypt);
 
-    const hashStr = crypto
-        .createHmac('sha256', apiSecret)
-        .update(encrypt)
-        .digest('base64');
-
-    // 3. BUILD THE AUTHORIZATION HEADER
-    let authorization;
-    if (apiType === "clientAuth") {
-        authorization = `hmac ${mid}:${reference}:${hashStr}`;
-    } else {
-        authorization = `hmac ${mid}::${hashStr}`;
-    }
-
-    // return {
-    //     "dateHeader": utcHeaderDate,
-    //     "Authorization": `hmac ${mid}:${reference}:${hashStr}`
-    // };
+    const hmacHash = CryptoJS.HmacSHA256(encrypt, apiSecret);
+    const finalHash = CryptoJS.enc.Base64.stringify(hmacHash);
 
     return {
-        "dateHeader": utcHeaderDate,
-        "Authorization": authorization
+        "dateHeader": dateHeader,
+        "Authorization": `hmac ${mid}:${reference}:${finalHash}`
     };
 }
 
@@ -158,53 +179,106 @@ function decryptPayload(encryptedHex, fingerprint) {
     }
 }
 
-function finalResponse(decryptedString, responseData, fingerprint, accessToken, merchantID, apiType, reference) {
+// function finalResponse(decryptedString, responseData, fingerprint, accessToken, merchantID, apiType, reference) {
+//     try {
+
+//         // 1. Check if we actually have the payLoad (Capital L)
+//         if (!responseData || !responseData.payLoad) {
+//             throw new Error("responseData.payLoad is missing or undefined");
+//         }
+
+
+//         // 2. The URL logic
+//         var endpoint = decryptedString.trim();
+//         console.log("endpoint.........", endpoint);
+//         const urlParts = endpoint.split('/').filter(part => part.length > 0);
+
+//         // Get the very last part of the URL (the GUID)
+//         const gatewayReference = urlParts[2];
+
+//         const txnReferenceFromUrl = urlParts[urlParts.length - 1];
+
+//         console.log(">>> EXTRACTED Gateway Reference:", gatewayReference);
+//         console.log(">>> EXTRACTED Txn Reference:", txnReferenceFromUrl);
+
+//         // if (urlParts.length > 1) {
+
+//         // Generate HMAC for the second step
+//         // const authObj = generateHmacHeaders(apiType, txnReference, accessToken, merchantID);
+//         const authObj = generateHmacHeaders(accessToken, merchantID, reference, apiType);
+//         const reqBody = {
+//             // "gatewayReference": gatewayRef, // The GUID from the URL
+//             // "merchantID": merchantID,
+//             // ...authObj
+//             "gatewayReference": gatewayReference,
+//             "merchantID": merchantID,
+//             "dateHeader": authObj.dateHeader,
+//             "Authorization": authObj.Authorization,
+//             "sync": false // Matches SDK logs
+//         };
+//         console.log("reqBody...........", reqBody)
+
+//         // Encrypt the new request
+//         var payloadData = encryptPayload(reqBody, accessToken, fingerprint);
+
+//         var finalData = {
+//             "data": JSON.stringify({
+//                 payLoad: payloadData,
+//                 "apiKey": merchantID
+//             }),
+//             "endpoint": endpoint
+//         };
+
+//         return finalData;
+//         // }
+//     } catch (err) {
+//         console.log("Error in finalResponse logic:", err.message);
+//         return { error: err.message };
+//     }
+// }
+
+function finalResponse(decryptedString, responseData, fingerprint, apiSecret, merchantID, reference) {
     try {
+        const endpoint = decryptedString.trim();
+        const updatedUrl = endpoint.replace("//", "/");
+        const urlParts = updatedUrl.split('/').filter(part => part.length > 0);
 
-        // 1. Check if we actually have the payLoad (Capital L)
-        if (!responseData || !responseData.payLoad) {
-            throw new Error("responseData.payLoad is missing or undefined");
+        // --- THE DYNAMIC SWITCHER ---
+        // This detects which of the 30+ APIs is being called based on the URL
+        let dynamicApiType = "clientAuth"; // Default
+        if (updatedUrl.includes('/payment/')) {
+            dynamicApiType = "withHPP";
+        } else if (updatedUrl.includes('/verification/')) {
+            dynamicApiType = "withVPP";
+        } else if (updatedUrl.includes('/status/')) {
+            dynamicApiType = "paymentStatus";
         }
+        // Add more here if needed, or it defaults to the UI-provided apiType
 
-        // 2. The URL logic
-        var endpoint = decryptedString.trim();
-        const urlParts = endpoint.split('/').filter(part => part.length > 0);
+        const gatewayReference = urlParts[2];
 
-        // Get the very last part of the URL (the GUID)
-        const gatewayReference = urlParts[urlParts.length - 1];
+        // Now we call HMAC with the apiSecret (AccessToken) and the NEW dynamic type
+        const authObj = generateHmacHeaders(apiSecret, merchantID, reference, dynamicApiType);
 
-        // if (urlParts.length > 1) {
-
-        // Generate HMAC for the second step
-        // const authObj = generateHmacHeaders(apiType, txnReference, accessToken, merchantID);
-        const authObj = generateHmacHeaders(accessToken, merchantID, reference, apiType);
         const reqBody = {
-            // "gatewayReference": gatewayRef, // The GUID from the URL
-            // "merchantID": merchantID,
-            // ...authObj
             "gatewayReference": gatewayReference,
             "merchantID": merchantID,
             "dateHeader": authObj.dateHeader,
             "Authorization": authObj.Authorization,
-            "sync": false // Matches SDK logs
+            "sync": false
         };
-        console.log("reqBody...........", reqBody)
 
-        // Encrypt the new request
-        var payloadData = encryptPayload(reqBody, accessToken, fingerprint);
+        const payloadData = encryptPayload(reqBody, apiSecret, fingerprint);
 
-        var finalData = {
+        return {
             "data": JSON.stringify({
                 payLoad: payloadData,
                 "apiKey": merchantID
             }),
             "endpoint": endpoint
         };
-
-        return finalData;
-        // }
     } catch (err) {
-        console.log("Error in finalResponse logic:", err.message);
+        console.error("finalResponse Error:", err.message);
         return { error: err.message };
     }
 }
@@ -227,6 +301,10 @@ app.post('/run-direct-test', (req, res) => {
             let { reqType } = req.body;
 
             const finalMethod = Array.isArray(reqType) ? reqType[0] : (reqType || 'POST');
+
+            const parsedPayload = JSON.parse(req.body.payload);
+            const payloadRef = parsedPayload.transaction?.txnReference;
+            const finalReference = payloadRef || req.body.reference || crypto.randomUUID();
 
             const certFile = req.files['certificate_upload']?.[0];
             const keyFile = req.files['key_upload']?.[0];
@@ -252,12 +330,17 @@ app.post('/run-direct-test', (req, res) => {
             console.log("Which MID is being used? ", mid);
 
             const finalBodyStr = JSON.stringify(finalBody);
-            const finalReference = uiReference || crypto.randomUUID();           
-             // const hmacData = generateHmacHeaders(apiSecret, mid, reference, reqType, apiType);
-            const hmacData = generateHmacHeaders(apiSecret, mid, finalReference, apiType);
+            // const finalReference = uiReference || crypto.randomUUID();
+            // const hmacData = generateHmacHeaders(apiSecret, mid, finalReference, apiType);
 
+            // const hmacData = generateHmacHeaders(apiSecret, mid, finalReference, "clientAuth");
 
+            const hmacData = generateHmacHeaders(apiSecret, mid, finalReference, apiType || "clientAuth");
             console.log(">>> [3] HMAC Headers generated:", hmacData);
+
+            console.log(">>> [FINAL CHECK] URL:", fullUrl);
+            console.log(">>> [FINAL CHECK] Auth Header:", hmacData.Authorization);
+            console.log(">>> [FINAL CHECK] Payload Ref:", parsedPayload.txnReference);
 
             // 1. Initialize Playwright Request Context with mTLS
             const origin = new URL(fullUrl).origin;
@@ -303,7 +386,8 @@ app.post('/run-direct-test', (req, res) => {
 
                         console.log(">>> Starting Decryption...");
                         const decryptedString = decryptPayload(responseData.payLoad, fingerprint);
-                        result = finalResponse(decryptedString, responseData, fingerprint, apiSecret, mid, apiType, finalReference);
+                        // result = finalResponse(decryptedString, responseData, fingerprint, apiSecret, mid, apiType, finalReference);
+                        result = finalResponse(decryptedString, responseData, fingerprint, apiSecret, mid, finalReference);
                         console.log("Result is ....", result);
 
                     } catch (decryptionError) {
