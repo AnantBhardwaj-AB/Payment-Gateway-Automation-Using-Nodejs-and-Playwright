@@ -179,68 +179,11 @@ function decryptPayload(encryptedHex, fingerprint) {
     }
 }
 
-// function finalResponse(decryptedString, responseData, fingerprint, accessToken, merchantID, apiType, reference) {
-//     try {
-
-//         // 1. Check if we actually have the payLoad (Capital L)
-//         if (!responseData || !responseData.payLoad) {
-//             throw new Error("responseData.payLoad is missing or undefined");
-//         }
-
-
-//         // 2. The URL logic
-//         var endpoint = decryptedString.trim();
-//         console.log("endpoint.........", endpoint);
-//         const urlParts = endpoint.split('/').filter(part => part.length > 0);
-
-//         // Get the very last part of the URL (the GUID)
-//         const gatewayReference = urlParts[2];
-
-//         const txnReferenceFromUrl = urlParts[urlParts.length - 1];
-
-//         console.log(">>> EXTRACTED Gateway Reference:", gatewayReference);
-//         console.log(">>> EXTRACTED Txn Reference:", txnReferenceFromUrl);
-
-//         // if (urlParts.length > 1) {
-
-//         // Generate HMAC for the second step
-//         // const authObj = generateHmacHeaders(apiType, txnReference, accessToken, merchantID);
-//         const authObj = generateHmacHeaders(accessToken, merchantID, reference, apiType);
-//         const reqBody = {
-//             // "gatewayReference": gatewayRef, // The GUID from the URL
-//             // "merchantID": merchantID,
-//             // ...authObj
-//             "gatewayReference": gatewayReference,
-//             "merchantID": merchantID,
-//             "dateHeader": authObj.dateHeader,
-//             "Authorization": authObj.Authorization,
-//             "sync": false // Matches SDK logs
-//         };
-//         console.log("reqBody...........", reqBody)
-
-//         // Encrypt the new request
-//         var payloadData = encryptPayload(reqBody, accessToken, fingerprint);
-
-//         var finalData = {
-//             "data": JSON.stringify({
-//                 payLoad: payloadData,
-//                 "apiKey": merchantID
-//             }),
-//             "endpoint": endpoint
-//         };
-
-//         return finalData;
-//         // }
-//     } catch (err) {
-//         console.log("Error in finalResponse logic:", err.message);
-//         return { error: err.message };
-//     }
-// }
-
 function finalResponse(decryptedString, responseData, fingerprint, apiSecret, merchantID, reference) {
     try {
         const endpoint = decryptedString.trim();
         const updatedUrl = endpoint.replace("//", "/");
+        console.log("updatedUrl....", updatedUrl);
         const urlParts = updatedUrl.split('/').filter(part => part.length > 0);
 
         // --- THE DYNAMIC SWITCHER ---
@@ -248,10 +191,6 @@ function finalResponse(decryptedString, responseData, fingerprint, apiSecret, me
         let dynamicApiType = "clientAuth"; // Default
         if (updatedUrl.includes('/payment/')) {
             dynamicApiType = "withHPP";
-        } else if (updatedUrl.includes('/verification/')) {
-            dynamicApiType = "withVPP";
-        } else if (updatedUrl.includes('/status/')) {
-            dynamicApiType = "paymentStatus";
         }
         // Add more here if needed, or it defaults to the UI-provided apiType
 
@@ -283,6 +222,23 @@ function finalResponse(decryptedString, responseData, fingerprint, apiSecret, me
     }
 }
 
+function findReference(obj) {
+    // List of keys the bank uses across different APIs
+    const targetKeys = ['txnReference', 'reference', 'orderId', 'registrationReference'];
+
+    for (const key in obj) {
+        if (targetKeys.includes(key) && obj[key]) {
+            return obj[key];
+        }
+        // If the value is another object, search inside it (recursive)
+        if (typeof obj[key] === 'object' && obj[key] !== null) {
+            const found = findReference(obj[key]);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
 app.post('/run-direct-test', (req, res) => {
     console.log(">>> [1] Connection established");
 
@@ -303,8 +259,11 @@ app.post('/run-direct-test', (req, res) => {
             const finalMethod = Array.isArray(reqType) ? reqType[0] : (reqType || 'POST');
 
             const parsedPayload = JSON.parse(req.body.payload);
-            const payloadRef = parsedPayload.transaction?.txnReference;
-            const finalReference = payloadRef || req.body.reference || crypto.randomUUID();
+            const finalReference = findReference(parsedPayload) || uiReference || "NO_REF_FOUND";
+            console.log(">>> [SMART SEARCH] Found Ref:", finalReference);
+
+            // const payloadRef = parsedPayload.transaction?.txnReference;
+            // const finalReference = payloadRef || req.body.reference;
 
             const certFile = req.files['certificate_upload']?.[0];
             const keyFile = req.files['key_upload']?.[0];

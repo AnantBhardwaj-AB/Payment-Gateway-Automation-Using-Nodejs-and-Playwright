@@ -120,7 +120,7 @@ export async function runTest(event, allData) {
         const result = await response.json();
         if (result.success && result.output) {
 
-            const keyToSave = ['planId', 'subscriptionId', 'paymenttransactionReference'];
+            const keyToSave = ['planId', 'subscriptionId', 'paymenttransactionReference', 'linkId', 'webhookId', 'tokenID', 'token_customerId'];
             keyToSave.forEach(key => {
                 if (result.output[key]) {
                     api[key] = result.output[key];

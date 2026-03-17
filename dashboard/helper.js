@@ -35,14 +35,13 @@ var shippingAddressLine2 = "US, NY";
 
 // Transaction  Details
 var transactionAmount = 10.00;
-var transactioncurrencyCode = "USD";
+var transactioncurrencyCode = "EUR";
 var transactionDescription = "Test Transaction";
 var transactionReference = crypto.randomUUID();
 var paymenttransactionReference = crypto.randomUUID();
 var type = "auth";
 var captureDuration = "7";
 var executionDate = "2022-04-20 14:23:20";
-var pageTag = "test_Page";
 var midTag = "";
 var fallbackMidTag = "test_fallback_midtag";
 var orderId = "ORDER-" + crypto.randomUUID();
@@ -50,9 +49,52 @@ var isApp = true;
 var executionDate = "2024-12-31 14:00:00";
 var pageTag = "Test Page Tag";
 var cardType = "VisaCard";
+var tokenId_cardType = "MasterCard";
+var tokenId_paymentMode = "CreditCard";
+var showAllCards = true;
 var customerEmail = "test@example.com";
+var showCustomData = "true";
 var hostedPage = false;
 var payout = "true";
+const sortColumn = {
+    cardHolderName: "cardHolderName",
+    currencyCode: "currencyCode",
+    customerId: "customerId",
+    ipAddress: "ipAddress",
+    paymentMode: "paymentMode",
+    status: "status",
+    transactionDate: "transactionDate",
+    transactionReference: "txnReference"
+}
+const fieldName = {
+
+    status: "status",
+    cardNumber: "cardNumber",
+    code: "code",
+    customerId: "customerId",
+    emailId: "emailId",
+    paymentMode: "paymentMode"
+}
+const fieldValue = {
+    success: "success",
+    cards: "Cards"
+}
+const sortOrder = {
+    ascending: "asc",
+    descending: "desc"
+}
+var local = "UTC";
+var fromCount = "0";
+var limit = "10";
+const reportType = {
+    transactionReport: "transactionReport",
+    refundReport: "refundReport",
+    chargebackReport: "chargebackReport",
+    customerPayoutReport: "customerPayoutsReport",
+    subscriptionReport: "subscriptionsReport",
+    plansReport: "plansReport",
+    subscriptionTransactionReport: "subscriptionTransactionReport"
+}
 const paymentMode = {
     credit_card: "CreditCard",
     bank_transfer: "BANK_TRANSFER",
@@ -65,7 +107,7 @@ const paymentMode = {
 }
 
 // Payment Details
-var cardNumber = "4000000000000000";
+var cardNumber = "4200000000000000";
 var expYear = "2030";
 var expMonth = "12";
 var nameOnCard = "John";
@@ -79,6 +121,34 @@ const paymentToken_PaymentMode = {
     applePay: "APPLE_PAY"
 }
 var merchantIdentifier = "";
+
+// Acquirer Token Details
+
+const acquirer = {
+    Checkout: "checkout",
+    Interac: "interac",
+    Novalnet: "novalnet",
+    Credorax: "credorax",
+    SafeCharge: "safecharge",
+    SecureTrade: "securetrade",
+    Truevo: "truevo",
+    TrustPay: "trustpay",
+    Worldline: "worldline",
+    Trustbucks: "trustbucks",
+    PXP: "pxp",
+    ValitorPay: "valitorpay",
+    Paysafe: "paysafe",
+    paystrax: "paystrax",
+    Hipay: "hipay",
+    Paynt: "paynt",
+    PayPal: "paypal"
+
+};
+var acquirerToken = "kwr" + crypto.randomUUID();
+var schemeTransactionId = "sti" + crypto.randomUUID();
+var acquirer_nameOnCard = "Johnathan";
+var acquirer_bin = "123678";
+var acquirer_last4 = "8888";
 
 // Recurring Payment Details
 var upsell = false;
@@ -217,8 +287,44 @@ var cryptoCurrency = "Bitcoin";
 var notificationChannelName = "sms";
 var notificationChannelValue = "1234567";
 
+// Refund Details
+var refundInvoiceNo = "GC12345F";
+var comments = "refunds";
 
-var customerId = crypto.randomUUID();
+// Payment Link Details
+var paymentLink = true;
+var paymentLinkDescription = "Payment for Grocery";
+
+var updatePaymentLink_FirstName = "Testing";
+var updatePaymentLink_TransactionAmount = "40";
+
+var subTotal = "19.41";
+var allow3D = true;
+var allowBillShip = true;
+
+var itemName = "RBK fitness shoes";
+var itemId = "ITM001";
+var itemPricePerUnit = "2";
+var itemQuantity = "2";
+
+var dob = "1997-08-07";
+var ip = "124.12.44.100";
+
+var customerId = self.crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+var token_customerId = self.crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+var acquirertoken_customerId = self.crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+
+
+
+//  Webhook Details
+
+var events = "payment,refund";
+var url = "https://www.example.com";
+var updatewebhook_url = "https://www.domain.com";
+const status = {
+    ACTIVE: "active",
+    INACTIVE: "inactive"
+}
 
 const api = {
     // This "get" ensures we always pull what's currently typed in the Api Key box
@@ -234,7 +340,7 @@ const api = {
     // Transaction
     transactionAmount, transactioncurrencyCode, transactionDescription, isApp, executionDate, pageTag,
     subtotalAmount, tax, shippingCharge, totalValue, paymentMode, cardType, cardNumber, expYear, expMonth, nameOnCard, saveDetails, cvv, paymentToken, paymentToken_PaymentMode,
-    merchantIdentifier, customerEmail, hostedPage, payout, paymenttransactionReference,
+    merchantIdentifier, customerEmail, hostedPage, payout, paymenttransactionReference, local, reportType, sortOrder, fieldName, fieldValue, fromCount, limit, sortColumn, showCustomData,
 
     // Subscription
     planName,
@@ -290,7 +396,9 @@ const api = {
     cancelUrl, showConfirmation, productUrl, dynamicDescriptorEmail, dynamicDescriptorName, dynamicDescriptorPhone,
     trustedBeneficiary, iFrame, secureCorporatePayment, delegatedAuthentication, recurringMITExemptionOther, recurringMITExemptionSameAmount,
     browserAcceptHeader, browserColorDepth, browserJavaEnabled, browserJavascriptEnabled, browserIP, osType, acceptContentType,
-    transactionReference, type, captureDuration, midTag, fallbackMidTag, notificationChannelName, notificationChannelValue, privacyURL, termsURL
+    transactionReference, type, captureDuration, midTag, fallbackMidTag, notificationChannelName, notificationChannelValue, privacyURL, termsURL, refundInvoiceNo, comments,
+    paymentLink, paymentLinkDescription, subTotal, allow3D, allowBillShip, itemName, itemId, itemPricePerUnit, itemQuantity, dob, ip, updatePaymentLink_FirstName, updatePaymentLink_TransactionAmount,
+    events, url, updatewebhook_url, status, tokenId_cardType, tokenId_paymentMode, showAllCards, token_customerId, acquirer, acquirerToken, schemeTransactionId, acquirer_nameOnCard, acquirer_bin, acquirer_last4, acquirertoken_customerId, 
 
 };
 
