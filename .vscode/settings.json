@@ -1,3 +1,8 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic"
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "automation/lib/java-wrapper-WHITELABEL_VERSION.jar",
+        "automation/lib/gson-2.10.1.jar"
+    ],
+    "java.errors.incompleteClasspath.severity": "ignore"
 }

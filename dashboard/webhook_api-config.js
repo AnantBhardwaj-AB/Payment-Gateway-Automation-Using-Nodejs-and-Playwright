@@ -1,7 +1,6 @@
 // api-config.js
 import { api } from './helper.js'
 
-
 window.apiData = window.apiData || {};
 window.apiData.webhook = {
     "register-webhook-config": {
