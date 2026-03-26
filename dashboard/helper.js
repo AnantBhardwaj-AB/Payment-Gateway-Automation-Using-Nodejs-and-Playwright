@@ -1,6 +1,8 @@
 
 
-var merchantID = document.getElementById('apiKey').value;
+// var merchantID = document.getElementById('apiKey').value;
+
+var merchantID = "PCA090925001";
 
 var lang = "en";
 

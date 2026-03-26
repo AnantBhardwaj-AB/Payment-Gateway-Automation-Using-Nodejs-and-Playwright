@@ -23,25 +23,32 @@ public class SDKBridge {
             String customerId = UUID.randomUUID().toString();
             String merchantID = data.get("merchant_id").getAsString();
 
-            Certificate cert = new Certificate("/home/anant/PCA090925001-crt.txt", "/home/anant/PCA090925001-key.txt");
-            
-            MerchantDTO merchant = new MerchantDTO(merchantID,customerId);
+            Certificate cert = new Certificate(
+                    "/home/anant/Documents/Wrapper-Certificates/Payment_Routing_Copy_Dev_Cert/PCA090925001-crt.pem",
+                    "/home/anant/Documents/Wrapper-Certificates/Payment_Routing_Copy_Dev_Cert/PCA090925001-key.pem");
+
+            MerchantDTO merchant = new MerchantDTO(merchantID, customerId);
 
             String response = "";
-            Map<String,Object> finalResponse = null;
+            Map<String, Object> finalResponse = null;
             Object result = null;
+
+            var paymentProcessor = PaymentFactory.getInstance(cert, merchant, "5d48540c32c4412ab39bb0fbdd0495f6").setStaging(true);
 
             // The Router Logic
             switch (apiName.toUpperCase()) {
+
                 case "PLUGIN_DETAILS":
+
                     String currency = data.get("currency").getAsString();
-                    result = PaymentFactory.getInstance(cert, merchant, "5d48540c32c4412ab39bb0fbdd0495f6").getPluginDetails(currency);
+                    result = paymentProcessor.getPluginDetails(currency);
                     break;
-                case "CREATE_PAYMENT":
+
+                case "Hosted Payment Page":
 
                     break;
 
-                case "REFUND":
+                case "Without Hosted Payment Page":
                     // // Example of another API in the same JAR
                     // response = RefundFactory.getInstance(cert, merchant).;
                     break;
@@ -50,6 +57,7 @@ public class SDKBridge {
                     response = "{\"error\": \"API " + apiName + " not found in Java Bridge\"}";
             }
 
+            System.out.println(result);
             System.out.println(response);
 
         } catch (Exception e) {

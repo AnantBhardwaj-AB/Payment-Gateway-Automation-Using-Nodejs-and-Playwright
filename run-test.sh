@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# --- 1. LOAD NVM (Fixes the SyntaxError) ---
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+nvm use 20.20.0 --silent
+
+# Verify it worked
+echo "Using Node version: $(node -v)"
+
 BASE_WRAPPER_DIR="/home/anant/Documents/Wrappers/wrapper-implementation"
 FRAMEWORK_DIR="/home/anant/Documents/SDK-Automation-Framework"
 
@@ -106,20 +114,30 @@ case $choice in
         ;;
     7)
         echo "🚀 Starting JAVA_SDK tests..."
-        # 1. Kill any zombie processes on port 8000
+        
+        # --- A. RE-COMPILE THE BRIDGE FIRST ---
+        echo "🛠️  Compiling Java Bridge..."
+        cd "$FRAMEWORK_DIR"
+        javac -cp "automation/lib/*:automation/bridge/java:." automation/bridge/java/SDKBridge.java
+        
+        if [ $? -ne 0 ]; then
+            echo "❌ Compilation FAILED! Aborting tests."
+            exit 1
+        fi
+
+        # --- B. HANDLE THE WEB SERVER ---
         sudo fuser -k 8000/tcp 2>/dev/null
+        cd "$BASE_WRAPPER_DIR/Java_wrapper_integration_test" && ./mvnw spring-boot:run > /dev/null 2>&1 &
         
-        # 2. Start the server in the background
-        cd $BASE_WRAPPER_DIR/Java_wrapper_integration_test && ./mvnw spring-boot:run > /dev/null 2>&1 &
-        
-        # 3. Wait for it to initialize
         echo "⏳ Waiting 15 seconds for Spring Boot to initialize..."
         sleep 15
         
-        # 4. Run the test
-        cd "$FRAMEWORK_DIR" && npx playwright test --project=JAVA_SDK
+        # --- C. RUN PLAYWRIGHT ---
+        echo "🧪 Running Playwright Tests..."
+        cd "$FRAMEWORK_DIR"
+        # SDK_LANG=java npx playwright test tests/sdk-regression.spec.js
+        SDK_LANG=java node ./node_modules/.bin/playwright test tests/sdk-regression.spec.js
         
-        # 5. Optional: Kill the server after the test is done
         sudo fuser -k 8000/tcp 2>/dev/null
         ;;
     8)

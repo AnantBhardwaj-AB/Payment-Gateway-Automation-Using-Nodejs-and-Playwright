@@ -1,1 +1,4 @@
-{"currency":"EUR","merchant_id":"PCA090925001"}
+{
+  "currency": "EUR",
+  "merchant_id": "PCA090925001"
+}

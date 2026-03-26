@@ -1,8 +1,9 @@
+
 {
   "PLUGIN_DETAILS": {
     "payload": {
-      "currency": "EUR",
-      "merchant_id": "PCA090925001"
+      "currency": "currencyCode",
+      "merchant_id": "merchantID"
     },
     "expectedStatus": "Successful"
   }
