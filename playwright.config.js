@@ -17,7 +17,7 @@ export default defineConfig({
   // 5. Global settings
   use: {
     // We are testing SDKs/APIs, so we don't need a browser window
-    headless: true,
+    headless: false,
     // Capture details only if a test fails
     trace: 'on-first-retry',
   },

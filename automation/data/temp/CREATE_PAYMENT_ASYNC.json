@@ -1,0 +1,53 @@
+{
+  "lang": "en",
+  "merchant": {
+    "merchantID": "PCA090925001",
+    "customerID": "d808cd9599ff"
+  },
+  "customer": {
+    "billingAddress": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "mobileNo": "123123123123",
+      "emailId": "test@g.co",
+      "addressLine1": "123Lane st thomas",
+      "addressLine2": "US, NY",
+      "city": "Anytown",
+      "state": "CA",
+      "zip": "12345",
+      "country": "US"
+    },
+    "shippingAddress": {
+      "sFirstName": "Jane",
+      "sLastName": "Smith",
+      "sMobileNo": "123123123123",
+      "sEmailId": "test@g.co",
+      "sAddressLine1": "123Lane st thomas",
+      "sAddressLine2": "US, NY",
+      "sCity": "Othertown",
+      "sState": "NY",
+      "sZip": "54321",
+      "sCountry": "US"
+    }
+  },
+  "transaction": {
+    "async": true,
+    "txnAmount": 10,
+    "currencyCode": "EUR",
+    "txnReference": "ASYNC-SFD13TYZ",
+    "paymentDetails": {
+      "cardNumber": "4200000000000000",
+      "cardType": "VisaCard",
+      "expYear": "2030",
+      "expMonth": "12",
+      "nameOnCard": "John",
+      "saveDetails": "true",
+      "cvv": "123"
+    }
+  },
+  "url": {
+    "successURL": "https://domain.com/success",
+    "failURL": "https://domain.com/failure",
+    "cancelURL": "https://domain.com/cancel"
+  }
+}

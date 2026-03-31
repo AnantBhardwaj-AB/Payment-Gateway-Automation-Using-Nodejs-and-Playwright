@@ -1,0 +1,28 @@
+{
+  "CAPTURE_PAYMENT": {
+    "payload": {
+        "merchantID":"merchantID",
+        "capture":{
+            "txnReference":"syncTransactionReference",
+            "currencyCode":"transactioncurrencyCode",
+            "amount":"transactionAmount"
+        },
+        "dynamicDescriptor":{
+            "name":"dynamicDescriptorName",
+            "email":"dynamicDescriptorEmail",
+            "mobile":"dynamicDescriptorPhone"
+        }
+    },
+    "expectedStatus": "Successful"
+  },
+  "VOID_PAYMENT": {
+    "payload": {
+        "merchantID":"merchantID",
+        "void":{
+            "txnReference":"asyncTransactionReference"
+        }
+    },
+    "expectedStatus": "Successful"
+  }
+
+}

@@ -1,0 +1,13 @@
+{
+  "merchantID": "PCA090925001",
+  "capture": {
+    "txnReference": "SYNC-OF6K8GGD",
+    "currencyCode": "EUR",
+    "amount": 10
+  },
+  "dynamicDescriptor": {
+    "name": "Test Descriptor",
+    "email": "test@example.com",
+    "mobile": "1234567890"
+  }
+}

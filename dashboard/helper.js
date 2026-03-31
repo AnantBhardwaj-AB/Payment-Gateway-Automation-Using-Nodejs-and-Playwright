@@ -8,6 +8,9 @@ var lang = "en";
 
 var currencyCode = "EUR";
 
+var async_call = true;
+var async_for_sync_call = false;
+
 //  Billing Information
 var billingFirstName = "John";
 var billingLastName = "Doe";
@@ -58,6 +61,12 @@ var customerEmail = "test@example.com";
 var showCustomData = "true";
 var hostedPage = false;
 var payout = "true";
+var senderDocumentType = "1";
+var senderDocumentId = "38624008328";
+var senderPixKey = "38624008328";
+var recipientDocumentType = "1";
+var recipientDocumentId = "38624008328";
+var recipientPixKey = "38624008328";
 const sortColumn = {
     cardHolderName: "cardHolderName",
     currencyCode: "currencyCode",
@@ -125,7 +134,6 @@ const paymentToken_PaymentMode = {
 var merchantIdentifier = "";
 
 // Acquirer Token Details
-
 const acquirer = {
     Checkout: "checkout",
     Interac: "interac",
@@ -316,10 +324,7 @@ var customerId = self.crypto.randomUUID().replace(/-/g, '').slice(0, 12);
 var token_customerId = self.crypto.randomUUID().replace(/-/g, '').slice(0, 12);
 var acquirertoken_customerId = self.crypto.randomUUID().replace(/-/g, '').slice(0, 12);
 
-
-
 //  Webhook Details
-
 var events = "payment,refund";
 var url = "https://www.example.com";
 var updatewebhook_url = "https://www.domain.com";
@@ -400,7 +405,8 @@ const api = {
     browserAcceptHeader, browserColorDepth, browserJavaEnabled, browserJavascriptEnabled, browserIP, osType, acceptContentType,
     transactionReference, type, captureDuration, midTag, fallbackMidTag, notificationChannelName, notificationChannelValue, privacyURL, termsURL, refundInvoiceNo, comments,
     paymentLink, paymentLinkDescription, subTotal, allow3D, allowBillShip, itemName, itemId, itemPricePerUnit, itemQuantity, dob, ip, updatePaymentLink_FirstName, updatePaymentLink_TransactionAmount,
-    events, url, updatewebhook_url, status, tokenId_cardType, tokenId_paymentMode, showAllCards, token_customerId, acquirer, acquirerToken, schemeTransactionId, acquirer_nameOnCard, acquirer_bin, acquirer_last4, acquirertoken_customerId, 
+    events, url, updatewebhook_url, status, tokenId_cardType, tokenId_paymentMode, showAllCards, token_customerId, acquirer, acquirerToken, schemeTransactionId, acquirer_nameOnCard, acquirer_bin, acquirer_last4, acquirertoken_customerId,
+    async_call, async_for_sync_call, senderDocumentId, senderDocumentType, senderPixKey, recipientDocumentType, recipientDocumentId, recipientPixKey
 
 };
 

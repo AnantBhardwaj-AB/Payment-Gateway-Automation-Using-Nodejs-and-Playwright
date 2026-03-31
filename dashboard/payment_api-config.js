@@ -207,7 +207,7 @@ window.apiData.payment = {
                 currencyCode: api.currencyCode,
                 txnReference: api.transactionReference,
                 orderId: api.orderId,
-                paymentMode: api.paymentMode,
+                paymentMode: api.paymentMode.credit_card,
                 cardType: api.cardType,
                 isApp: api.isApp,
                 type: api.type,

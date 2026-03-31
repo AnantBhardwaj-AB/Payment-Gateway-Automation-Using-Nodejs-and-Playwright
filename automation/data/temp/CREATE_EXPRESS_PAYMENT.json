@@ -1,0 +1,44 @@
+{
+  "lang": "en",
+  "merchant": {
+    "merchantID": "PCA090925001",
+    "customerID": "86dba297887d"
+  },
+  "customer": {
+    "billingAddress": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "mobileNo": "123123123123",
+      "emailId": "test@g.co",
+      "addressLine1": "123Lane st thomas",
+      "addressLine2": "US, NY",
+      "city": "Anytown",
+      "state": "CA",
+      "zip": "12345",
+      "country": "US"
+    },
+    "shippingAddress": {
+      "sFirstName": "Jane",
+      "sLastName": "Smith",
+      "sMobileNo": "123123123123",
+      "sEmailId": "test@g.co",
+      "sAddressLine1": "123Lane st thomas",
+      "sAddressLine2": "US, NY",
+      "sCity": "Othertown",
+      "sState": "NY",
+      "sZip": "54321",
+      "sCountry": "US"
+    }
+  },
+  "transaction": {
+    "txnAmount": 10,
+    "currencyCode": "EUR",
+    "txnReference": "EXP-IJKHQKGJ",
+    "cardType": "VisaCard"
+  },
+  "url": {
+    "successURL": "https://domain.com/success",
+    "failURL": "https://domain.com/failure",
+    "cancelURL": "https://domain.com/cancel"
+  }
+}

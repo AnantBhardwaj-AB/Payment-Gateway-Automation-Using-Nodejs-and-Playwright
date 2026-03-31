@@ -1,10 +1,225 @@
-
 {
   "PLUGIN_DETAILS": {
     "payload": {
       "currency": "currencyCode",
-      "merchant_id": "merchantID"
+      "merchantID": "merchantID"
     },
     "expectedStatus": "Successful"
+  },
+  "CREATE_PAYMENT": {
+    "payload": {
+      "lang": "lang",
+      "merchant": {
+        "merchantID": "merchantID",
+        "customerID": "customerId"
+      },
+      "customer": {
+        "billingAddress": {
+          "firstName": "billingFirstName",
+          "lastName": "billingLastName",
+          "mobileNo": "billingMobileNo",
+          "emailId": "billingEmailId",
+          "addressLine1": "billingAddressLine1",
+          "addressLine2": "billingAddressLine2",
+          "city": "billingCity",
+          "state": "billingState",
+          "zip": "billingZip",
+          "country": "billingCountry"
+        },
+        "shippingAddress": {
+          "sFirstName": "shippingFirstName",
+          "sLastName": "shippingLastName",
+          "sMobileNo": "shippingMobileNo",
+          "sEmailId": "shippingEmailId",
+          "sAddressLine1": "shippingAddressLine1",
+          "sAddressLine2": "shippingAddressLine2",
+          "sCity": "shippingCity",
+          "sState": "shippingState",
+          "sZip": "shippingZip",
+          "sCountry": "shippingCountry"
+        }
+      },
+      "transaction": {
+        "txnAmount": "transactionAmount",
+        "currencyCode": "transactioncurrencyCode",
+        "txnReference": "paymenttransactionReference"
+      },
+      "url": {
+        "successURL": "successUrl",
+        "failURL": "failureUrl",
+        "cancelURL": "cancelUrl"
+      }
+    },
+    "validationStrategy": "MATCH_VALUE",
+    "expectedField": "status",
+    "expectedValue": "Successful"
+  },
+  "CREATE_EXPRESS_PAYMENT": {
+    "payload": {
+      "lang": "lang",
+      "merchant": {
+        "merchantID": "merchantID",
+        "customerID": "customerId"
+      },
+      "customer": {
+        "billingAddress": {
+          "firstName": "billingFirstName",
+          "lastName": "billingLastName",
+          "mobileNo": "billingMobileNo",
+          "emailId": "billingEmailId",
+          "addressLine1": "billingAddressLine1",
+          "addressLine2": "billingAddressLine2",
+          "city": "billingCity",
+          "state": "billingState",
+          "zip": "billingZip",
+          "country": "billingCountry"
+        },
+        "shippingAddress": {
+          "sFirstName": "shippingFirstName",
+          "sLastName": "shippingLastName",
+          "sMobileNo": "shippingMobileNo",
+          "sEmailId": "shippingEmailId",
+          "sAddressLine1": "shippingAddressLine1",
+          "sAddressLine2": "shippingAddressLine2",
+          "sCity": "shippingCity",
+          "sState": "shippingState",
+          "sZip": "shippingZip",
+          "sCountry": "shippingCountry"
+        }
+      },
+      "transaction": {
+        "txnAmount": "transactionAmount",
+        "currencyCode": "transactioncurrencyCode",
+        "txnReference": "transactionReference",
+        "paymentMode": "CreditCard",
+        "cardType": "cardType"
+      },
+      "url": {
+        "successURL": "successUrl",
+        "failURL": "failureUrl",
+        "cancelURL": "cancelUrl"
+      }
+    },
+    "validationStrategy": "MATCH_VALUE",
+    "expectedField": "status",
+    "expectedValue": "Successful"
+  },
+  "CREATE_PAYMENT_ASYNC": {
+    "payload": {
+      "lang": "lang",
+      "merchant": {
+        "merchantID": "merchantID",
+        "customerID": "customerId"
+      },
+      "customer": {
+        "billingAddress": {
+          "firstName": "billingFirstName",
+          "lastName": "billingLastName",
+          "mobileNo": "billingMobileNo",
+          "emailId": "billingEmailId",
+          "addressLine1": "billingAddressLine1",
+          "addressLine2": "billingAddressLine2",
+          "city": "billingCity",
+          "state": "billingState",
+          "zip": "billingZip",
+          "country": "billingCountry"
+        },
+        "shippingAddress": {
+          "sFirstName": "shippingFirstName",
+          "sLastName": "shippingLastName",
+          "sMobileNo": "shippingMobileNo",
+          "sEmailId": "shippingEmailId",
+          "sAddressLine1": "shippingAddressLine1",
+          "sAddressLine2": "shippingAddressLine2",
+          "sCity": "shippingCity",
+          "sState": "shippingState",
+          "sZip": "shippingZip",
+          "sCountry": "shippingCountry"
+        }
+      },
+      "transaction": {
+        "async": "async_call",
+        "txnAmount": "transactionAmount",
+        "currencyCode": "transactioncurrencyCode",
+        "txnReference": "asyncTransactionReference",
+        "paymentMode": "CreditCard",
+        "paymentDetails": {
+          "cardNumber": "cardNumber",
+          "cardType": "cardType",
+          "expYear": "expYear",
+          "expMonth": "expMonth",
+          "nameOnCard": "nameOnCard",
+          "saveDetails": "saveDetails",
+          "cvv": "cvv"
+        }
+      },
+      "url": {
+        "successURL": "successUrl",
+        "failURL": "failureUrl",
+        "cancelURL": "cancelUrl"
+      }
+    },
+    "validationStrategy": "MATCH_VALUE",
+    "expectedField": "status",
+    "expectedValue": "Successful"
+  },
+  "CREATE_PAYMENT_SYNC": {
+    "payload": {
+      "lang": "lang",
+      "merchant": {
+        "merchantID": "merchantID",
+        "customerID": "customerId"
+      },
+      "customer": {
+        "billingAddress": {
+          "firstName": "billingFirstName",
+          "lastName": "billingLastName",
+          "mobileNo": "billingMobileNo",
+          "emailId": "billingEmailId",
+          "addressLine1": "billingAddressLine1",
+          "addressLine2": "billingAddressLine2",
+          "city": "billingCity",
+          "state": "billingState",
+          "zip": "billingZip",
+          "country": "billingCountry"
+        },
+        "shippingAddress": {
+          "sFirstName": "shippingFirstName",
+          "sLastName": "shippingLastName",
+          "sMobileNo": "shippingMobileNo",
+          "sEmailId": "shippingEmailId",
+          "sAddressLine1": "shippingAddressLine1",
+          "sAddressLine2": "shippingAddressLine2",
+          "sCity": "shippingCity",
+          "sState": "shippingState",
+          "sZip": "shippingZip",
+          "sCountry": "shippingCountry"
+        }
+      },
+      "transaction": {
+        "async": "async_for_sync_call",
+        "txnAmount": "transactionAmount",
+        "currencyCode": "transactioncurrencyCode",
+        "txnReference": "syncTransactionReference",
+        "paymentMode": "CreditCard",
+        "paymentDetails": {
+          "cardNumber": "cardNumber",
+          "cardType": "cardType",
+          "expYear": "expYear",
+          "expMonth": "expMonth",
+          "nameOnCard": "nameOnCard",
+          "saveDetails": "saveDetails",
+          "cvv": "cvv"
+        }
+      },
+      "url": {
+        "successURL": "successUrl",
+        "failURL": "failureUrl",
+        "cancelURL": "cancelUrl"
+      }
+    },
+    "validationStrategy": "MATCH_VALUE",
+    "expectedField": "status",
+    "expectedValue": "Successful"
   }
 }
